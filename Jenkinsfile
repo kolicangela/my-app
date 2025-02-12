@@ -3,7 +3,7 @@ pipeline {
 
     tools {
         // Reference to Docker tool configured in Jenkins
-        docker 'docker'  // Ensure 'docker' matches the name you've set in Jenkins Global Tool Configuration
+        dockerTool 'docker'  // Ensure 'docker' matches the name you've set in Jenkins Global Tool Configuration
     }
 
     environment {
