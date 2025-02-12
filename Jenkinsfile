@@ -2,29 +2,14 @@ pipeline {
     agent any
 
     tools {
-        // Reference to Docker tool configured in Jenkins
-        dockerTool 'Docker-27.4.0,'  // Ensure 'docker' matches the name you've set in Jenkins Global Tool Configuration
-    }
-
-    environment {
-        // Replace with your Docker Hub image name
-        DOCKER_IMAGE = "angelakolikj959/my-app"
-        
-        // Jenkins credentials IDs for Docker and GitHub
-        DOCKER_CREDENTIALS_ID = "docker-hub-credentials"
-        GITHUB_CREDENTIALS_ID = "github-credentials"
-        
-        // Replace with your GitHub repository URL
-        GITHUB_REPO = "https://github.com/kolicangela/my-app.git"
+        docker 'Docker-27.4.0,'  // Use the tool configured in Jenkins
     }
 
     stages {
-        stage('Checkout') {
+        stage('Checkout Git Repository') {
             steps {
-                script {
-                    // Checkout code from GitHub repository
-                    git credentialsId: GITHUB_CREDENTIALS_ID, url: GITHUB_REPO, branch: 'master'
-                }
+                // Checkout the repository (optional, for standard pipelines)
+                git url: 'https://github.com/kolicangela/my-app.git', branch: 'master'
             }
         }
 
@@ -32,7 +17,7 @@ pipeline {
             steps {
                 script {
                     // Build Docker image with the latest tag
-                    sh '/usr/bin/docker build -t my-app:latest .'
+                    sh 'docker build -t my-app:latest .'
                 }
             }
         }
@@ -40,9 +25,9 @@ pipeline {
         stage('Login to Docker Hub') {
             steps {
                 script {
-                    // Use stored credentials to login to Docker Hub
-                    withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    // Use withCredentials to securely handle your credentials
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh "echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin"
                     }
                 }
             }
@@ -51,11 +36,8 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    // Tag the Docker image and push it to Docker Hub
-                    sh """
-                        docker tag my-app:latest $DOCKER_IMAGE:latest
-                        docker push $DOCKER_IMAGE:latest
-                    """
+                    // Push the Docker image to Docker Hub
+                    sh 'docker push my-app:latest'
                 }
             }
         }
