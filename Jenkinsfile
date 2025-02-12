@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        docker 'Docker-27.4.0,'  // Use the tool configured in Jenkins
+        docker 'Docker-27.4.0'  // Use the tool configured in Jenkins
     }
 
     stages {
