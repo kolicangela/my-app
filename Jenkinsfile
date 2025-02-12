@@ -32,7 +32,7 @@ pipeline {
             steps {
                 script {
                     // Build Docker image with the latest tag
-                    sh 'docker build -t my-app:latest .'
+                    sh '/usr/bin/docker build -t my-app:latest .'
                 }
             }
         }
